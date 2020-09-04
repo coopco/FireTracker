@@ -4,6 +4,7 @@ library(shinydashboard)
 library(ggplot2)
 
 nFires <- read.csv("CorrelationData.csv")
+nFires$Date <- as.Date(nFires$Date)
 
 ui = dashboardPage(
   dashboardHeader(title = "Bushfire Tracker"),
