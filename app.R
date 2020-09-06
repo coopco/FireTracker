@@ -21,8 +21,9 @@ basemapOptions = leafletOptions(zoomSnap = 0.25, minZoom = 4.75, zoomControl = F
 
 basemap = leaflet(shapes, options = basemapOptions) %>%
   addProviderTiles(providers$Esri.WorldGrayCanvas) %>%
-  setView(123, -28, 4.75) %>%
-  setMaxBounds(79.8, 1.47, 187.13, -56.13) %>%
+  #setView(123, -28, 4.75) %>%
+  fitBounds(73, 3.5, 178, -51.5) %>%
+  setMaxBounds(73, 3.5, 178, -51.5) %>%
   # Add markers
   #addCircleMarkers(clusterOptions = hotspotClusterOptions,
   #  #radius = ~ifelse(power == -1, 6, floor(power)),
@@ -38,7 +39,7 @@ basemap = leaflet(shapes, options = basemapOptions) %>%
     onClick=JS("function(btn, map) { map.zoomOut(); }"))) %>%
   addEasyButton(easyButton(position = "topright",
     icon="fa-globe", title="Reset zoom",
-    onClick=JS("function(btn, map){ map.setView([-28, 123], 4.75); }"))) %>%
+    onClick=JS("function(btn, map){ map.flyToBounds(map.fitBounds([[73,3.5],[178,-51.5]])); }"))) %>% # wtf
   addEasyButton(easyButton(position = "topright",
     icon="fa-crosshairs", title="Locate Me",
     onClick=JS("function(btn, map){ map.locate({setView: true}); }"))) %>%
