@@ -4,6 +4,7 @@ library(shinydashboard)
 library(ggplot2)
 
 nFires <- read.csv("CorrelationData.csv")
+nFires$Date <- as.Date(nFires$Date)
 
 ui = dashboardPage(
   dashboardHeader(title = "Bushfire Tracker"),
@@ -51,7 +52,10 @@ server <- function(input, output){
   #correlation plot
   output$corrPlot <- renderPlot({
     stateName <- input$State  #selected data
-    selectedData <- nFires[which(nFires$State==stateName),]  #just that state 
+    selectedData<- nFires
+    if(stateName!="ALL"){ #if not all states, take subset of data
+      selectedData <- nFires[which(nFires$State==stateName),]  #just that state 
+    }
     
     scatter<- ggplot(selectedData, aes(x=Date, y=nFire, color = Temperature)) +
       geom_point(alpha=0.7) + ggtitle(paste("Number of Fires and Temperature Over Time in "), stateName) +
