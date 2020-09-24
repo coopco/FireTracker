@@ -8,6 +8,8 @@ library(geojsonio)
 library(htmltools)
 library(ggplot2)
 
+nFires <- read.csv("data/CorrelationData.csv")
+nFires$Date <- as.Date(nFires$Date)
 #pal = colorNumeric("YlOrRd", c(0:72))
 #hotspots = geojson_read("data/recenthotspots.json", what="sp")
 #hotspotClusterOptions = markerClusterOptions(maxClusterRadius = 40)
@@ -23,7 +25,7 @@ basemap = leaflet(shapes, options = basemapOptions) %>%
   addProviderTiles(providers$Esri.WorldGrayCanvas) %>%
   #setView(123, -28, 4.75) %>%
   fitBounds(73, 3.5, 178, -51.5) %>%
-  setMaxBounds(73, 3.5, 178, -51.5) %>%
+  #setMaxBounds(73, 3.5, 178, -51.5) %>%
   # Add markers
   #addCircleMarkers(clusterOptions = hotspotClusterOptions,
   #  #radius = ~ifelse(power == -1, 6, floor(power)),
@@ -40,9 +42,6 @@ basemap = leaflet(shapes, options = basemapOptions) %>%
   addEasyButton(easyButton(position = "topright",
     icon="fa-globe", title="Reset zoom",
     onClick=JS("function(btn, map){ map.flyToBounds(map.fitBounds([[73,3.5],[178,-51.5]])); }"))) %>% # wtf
-  addEasyButton(easyButton(position = "topright",
-    icon="fa-crosshairs", title="Locate Me",
-    onClick=JS("function(btn, map){ map.locate({setView: true}); }"))) %>%
   addLegend(pal = pal, value = ~spice, opacity = 0.7, title = "Temp", position = "bottomright") %>%
   addPolygons(
     layerId = 1:length(shapes),
@@ -76,12 +75,24 @@ ui <- bootstrapPage(
         
         absolutePanel(id = "control", fixed = TRUE, width = 400, height ="auto",
                       top = 77, left = 16, right = "auto", bottom = 16,
-          h2("Cool fire stats"),
+          #h2("Cool fire stats"),
+          h2(""),
           textOutput("mytext")
         )
       )
     ),
-    tabPanel("Other stuff"
+    tabPanel("Previous trends",
+      #tabs to select data in graph
+      selectInput("State", "State:",
+                c("All" = "ALL",
+                  "Queensland" = "QLD",
+                  "Victoria" = "VIC",
+                  "New South Wales" = "NSW",
+                  "Northern Territory" = "NT",
+                  "South Australia" = "SA",
+                  "Tasmania" = "TAS")),
+      #show correlation plot
+      plotOutput("corrPlot", width = "50%")
     )
   )
 )
@@ -100,6 +111,21 @@ server <- function(input, output) {
   #  event <- input$mymap_shape_click
   #  #leafletproxy
   #})
+  
+  #correlation plot
+  output$corrPlot <- renderPlot({
+    stateName <- input$State  #selected data
+    selectedData <- nFires
+    if(stateName!="ALL"){ #if not all states, take subset of data
+      selectedData <- nFires[which(nFires$State==stateName),]  #just that state 
+    }
+    
+    scatter <- ggplot(selectedData, aes(x=Date, y=nFire, color = Temperature)) +
+      geom_point(alpha=0.7) + ggtitle(paste("Number of Fires and Temperature Over Time in "), stateName) +
+      ylab("Number of Fires") + xlab("Month")
+    scatter + scale_color_gradient(low="white", high="red")
+    
+  })
 }
 
 shinyApp(ui, server)
