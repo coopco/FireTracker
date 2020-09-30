@@ -2,7 +2,7 @@ fires <- read.csv("Datasets/fires_nice.csv")
 weather <- read.csv("Datasets/cleanedWeather.csv")
 stations <- read.csv("Datasets/stationLocations.csv")
 
-fires <- fires[fires$instrument=="MODIS",]
+fire_data <- fires[fires$instrument=="MODIS",]
 
 # Fire classes:
 # 1: frp <= 200, 2: frp <= 500, 3: frp < 900, 4: frp >= 900
