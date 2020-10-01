@@ -60,7 +60,7 @@ server <- function(input, output) {
       bbox <- shapes[event$id,]@bbox
       leafletProxy("map", data=cells) %>% addPolygons(
           group = new_station_name,
-          fillColor = ~cells_pal(func(spice)), #TODO change
+          fillColor = ~cells_pal(spice), #TODO change
           weight = 2,
           opacity = 1,
           color = "white",
