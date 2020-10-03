@@ -10,6 +10,7 @@ library(ggplot2)
 
 library(rgdal)
 
+
 shapes <- readOGR("data/voronoi/voronoi.shp")
 pal <- colorNumeric("YlOrRd", domain = shapes$spice)
 labels <- sprintf("<strong>%s</strong><br/>%g%% risk", shapes$stationNam, shapes$spice*100) %>% lapply(htmltools::HTML)
@@ -23,6 +24,8 @@ cells_pal <- colorNumeric("YlOrRd", domain = c(0,1))
 old_station_name <- "-1"
 clicked_ids <- c()
 #labels <- sprintf("<strong>%s</strong><br/>%g%% risk", shapes$id, shapes$vegetation*100) %>% lapply(htmltools::HTML)
+
+vegetation_names <- read.csv("data/vegetation_names.csv")
 
 basemapOptions <- leafletOptions(zoomSnap = 0.25, minZoom = 4.75, zoomControl = FALSE)
 
@@ -101,7 +104,7 @@ mapServer <- function(input, output) {
     } else {
       clicked_ids <<- c(clicked_ids, event$id)
       cells <- cells_df[cells_df$id == event$id,]
-      cell_labels <- sprintf("<strong>%s</strong><br/>%g%% risk", rep(shapes$stationNam[event$id]), cells$spice*100) %>% lapply(htmltools::HTML)
+      cell_labels <- sprintf("<strong>%s</strong><br/>%g%% risk", vegetation_names$Name[cells$vegetation+1], cells$spice*100) %>% lapply(htmltools::HTML)
       bbox <- shapes[event$id,]@bbox
       leafletProxy("map", data=cells) %>% addPolygons(
         group = new_station_name,
@@ -117,8 +120,14 @@ mapServer <- function(input, output) {
           dashArray = "",
           fillOpacity = 0.7,
           bringToFront = TRUE
+        ),
+        label = cell_labels,
+        labelOptions = labelOptions(
+          style = list("font-weight" = "normal", padding = "3px 8px"),
+          textsize = "15px",
+          direction = "auto"
         )
-        ) %>% 
+      ) %>% 
       hideGroup(old_station_name) %>%
       flyToBounds(bbox[1], bbox[2], bbox[3], bbox[4]) # zoom to shape
     }
