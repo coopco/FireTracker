@@ -43,42 +43,7 @@ server <- function(input, output) {
     } 
   })
   
-  observeEvent(input$map_shape_click, {
-    event <- input$map_shape_click
-    new_station_name <- shapes$stationNam[event$id]
-    if (is.null(event$id)){
-      # Do nothing
-    } else if (event$id %in% clicked_ids) {
-      bbox <- shapes[event$id,]@bbox
-      leafletProxy("map") %>% hideGroup(old_station_name) %>%
-      showGroup(new_station_name) %>%
-      fitBounds(bbox[1], bbox[2], bbox[3], bbox[4]) # zoom to shape
-    } else {
-      clicked_ids <<- c(clicked_ids, event$id)
-      cells <- cells_df[cells_df$id == event$id,]
-      cell_labels <- sprintf("<strong>%s</strong><br/>%g%% risk", rep(shapes$stationNam[event$id]), cells$spice*100) %>% lapply(htmltools::HTML)
-      bbox <- shapes[event$id,]@bbox
-      leafletProxy("map", data=cells) %>% addPolygons(
-          group = new_station_name,
-          fillColor = ~cells_pal(spice), #TODO change
-          weight = 2,
-          opacity = 1,
-          color = "white",
-          dashArray = "3",
-          fillOpacity=0.7,
-          highlight = highlightOptions(
-            weight = 5,
-            color = "white",
-            dashArray = "",
-            fillOpacity = 0.7,
-            bringToFront = TRUE
-          )
-        ) %>% 
-      hideGroup(old_station_name) %>%
-      flyToBounds(bbox[1], bbox[2], bbox[3], bbox[4]) # zoom to shape
-    }
-    old_station_name <<- new_station_name
-  })
+  mapServer(input, output)
   
   #correlation plot
   output$corrPlot <- renderPlot({
