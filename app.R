@@ -7,6 +7,7 @@ library(shinythemes)
 library(geojsonio)
 library(htmltools)
 library(ggplot2)
+library(rgdal)
 source("map.R", local=TRUE)
 
 nFires <- read.csv("data/CorrelationData.csv")
@@ -32,17 +33,6 @@ ui <- bootstrapPage(
 )
 
 server <- function(input, output) {
-  output$map <- renderLeaflet({
-    basemap
-  })
-  
-  output$text <- renderText ({
-    event <- input$map_shape_click
-    if (!is.null(event)) {
-      sprintf("%s has been selected", shapes$stationNam[event$id])
-    } 
-  })
-  
   mapServer(input, output)
   
   #correlation plot
