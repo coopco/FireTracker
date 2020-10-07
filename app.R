@@ -22,7 +22,6 @@ ui <- bootstrapPage(
 server <- function(input, output) {
   mapServer(input, output)
   TrendsServer(input,output)  
-  })
 }
 
 shinyApp(ui, server)

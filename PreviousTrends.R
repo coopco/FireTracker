@@ -1,8 +1,8 @@
-nFires <- read.csv("CorrelationData.csv")
+nFires <- read.csv("data/CorrelationData.csv")
 nFires$Date <- as.Date(nFires$Date)
 
-TrendsTab <- tabItem(tabName = "previoustrends",
-                          h2("Previous Trends"), 
+TrendsTab <- tabPanel("Previous Trends", tabName = "previoustrends",
+                      div(h2("Previous Trends"), 
                           #tabs to select data in graph
                           selectInput("State", "State:",
                                       c("All" = "ALL",
@@ -13,7 +13,7 @@ TrendsTab <- tabItem(tabName = "previoustrends",
                                         "South Australia" = "SA",
                                         "Tasmania" = "TAS")),
                           #show correlation plot
-                          plotlyOutput("corrPlot"))
+                          plotlyOutput("corrPlot")))
 
 TrendsServer <- function(input, output){
   #correlation plot
