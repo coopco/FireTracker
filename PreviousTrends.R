@@ -19,14 +19,14 @@ TrendsServer <- function(input, output){
   #correlation plot
   output$corrPlot <- renderPlotly({
     stateName <- input$State  #selected data
-    selectedData<- nFires
+    selectedData<- Fires
     if(stateName!="ALL"){ #if not all states, take subset of data
-      selectedData <- nFires[which(nFires$State==stateName),]  #just that state 
+      selectedData <- Fires[which(Fires$State==stateName),]  #just that state 
     }
     else{
       stateName <- 'Australia'  #change so title says aus
     }
-    scatter<- ggplot(selectedData, aes(x=Date, y=nFire, color = Temperature)) +
+    scatter<- ggplot(selectedData, aes(x=Date, y=Fire, color = Temperature)) +
       geom_point(alpha=0.7) + ggtitle(paste("Number of Fires and Temperature Over Time in", stateName)) +
       ylab("Number of Fires") + xlab("Year") #plot
     ggplotly(scatter + scale_color_gradient(low="white", high="red") + theme(plot.background = element_rect(fill = '#ecf0f5', colour = '#ecf0f5'),
