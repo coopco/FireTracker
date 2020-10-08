@@ -11,9 +11,11 @@ library(rgdal)
 library(plotly)
 source("map.R", local=TRUE)
 source("PreviousTrends.R", local=TRUE)
+source("home.R", local=TRUE)
 
 ui <- bootstrapPage(
   navbarPage(theme=shinytheme("flatly"), collapsible = TRUE, id="nav", title="Fire Tracker",
+    homeTab,
     mapTab,
     TrendsTab
   )
