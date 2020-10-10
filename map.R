@@ -18,7 +18,9 @@ clicked_ids <- c()
 
 focused <- FALSE
 
-basemapOptions <- leafletOptions(zoomSnap = 0.25, minZoom = 4.75, zoomControl = FALSE)
+# TODO disable scroll wheel zoom
+basemapOptions <- leafletOptions(zoomSnap = 0.25, minZoom = 4.75, doubleClickZoom = FALSE, scrollWheelZoom = FALSE,
+                                 zoomControl = FALSE, dragging = FALSE)
 
 basemap <- leaflet(shapes, options = basemapOptions) %>%
   addProviderTiles(providers$Esri.WorldGrayCanvas) %>%
@@ -99,6 +101,9 @@ mapServer <- function(input, output) {
       cells <- cells_df[cells_df$id == event$id,]
       cell_labels <- sprintf("<strong>%s</strong><br/>%g%% risk", vegetation_names$Name[cells$vegetation+1], cells$spice*100) %>% lapply(htmltools::HTML)
       bbox <- shapes[event$id,]@bbox
+      
+      cells$spice2 = shapes$spice[event$id] * cells$spice/sum(cells$spice)
+      
       leafletProxy("map", data=cells) %>% addPolygons(
         group = new_station_name,
         fillColor = ~cells_pal(spice), #TODO change

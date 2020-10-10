@@ -1,3 +1,4 @@
+# awk 'FNR==1 && NR!=1{next;}{print}' *.csv > combined.csv 
 weather <- read.csv("Datasets/DoubleCleanWeather.csv")
 weather <- weather[,-8]
 weather <- weather[,-8]
