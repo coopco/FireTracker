@@ -61,7 +61,6 @@ mapPanelServer <- function(input, output) {
         windText <-     paste("<h3 style='display: inline'>",icon('wind'),currWeather$WindSpeed,"</h3>",'km/h &nbsp;&nbsp;(',windDiff,')')
         humidityText <- paste("<h3 style='display: inline'>",icon('tint'),paste(currWeather$Humidity,'%',sep=""),"</h3>",'humidity &nbsp;&nbsp;(',paste(humidityDiff,'%',sep=""),')')
         rainText <-     paste("<h3 style='display: inline'>",icon('cloud-showers-heavy'),currWeather$Rainfall,"</h3>",'mm &nbsp;&nbsp;(',rainDiff,')')
-        #str1 <- paste("<h3 style=\"text-align: left\">", tempText, windText, humidityText, rainText, "</h3>", sep="</br>")
         str1 <- paste(paste("</br>&nbsp;&nbsp;&nbsp;&nbsp",tempText), windText, humidityText, rainText, "", sep="</br></br>&nbsp;&nbsp;&nbsp;&nbsp;")
         HTML(paste(str1))
         })
@@ -76,7 +75,7 @@ mapPanelServer <- function(input, output) {
   })
   
   observeEvent(input$back, {
-    # Add non-focus psnel stuff
+    # Add non-focus panel stuff
     output$panelTitle <- NULL
     output$panelText <- NULL
     output$panelPlot <- NULL

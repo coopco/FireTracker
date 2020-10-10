@@ -71,10 +71,10 @@ write.csv(weather, "data/weather2020.csv", row.names=FALSE)
 
 
 # Update shapefiles
-#cells$vegetation[cells$vegetation==35] <- 0
 library(rgdal)
 currWeather <- weather[weather$Date == currDate,]
 cells <- readOGR("data/grid/voronoi.shp")
+
 for (i in 1:length(cells)) {
     stationName <- stations$name[cells$id[i]]
     colNum <- cells$vegetation[i] + 19
@@ -85,12 +85,7 @@ for (i in 1:length(cells)) {
 writeOGR(cells, dsn="data/grid", layer="voronoi", driver="ESRI Shapefile", overwrite_layer = T)
 
 voronoi <- readOGR("data/voronoi/voronoi.shp")
-#voronoi$spice <- currWeather$Prediction12
-#for (i in 1:length(voronoi)) {
-#    station_cells <- cells[cells$id == i,]
-#    uniqv = unique(station_cells$vegetation)
-#    voronoi$vegetation[i] <- uniqv[which.max(tabulate(match(station_cells$vegetation, uniqv)))]
-#}
+
 for (i in 1:length(voronoi)) {
     stationName <- stations$name[voronoi$id[i]]
     colNum <- voronoi$vegetation[i] + 19

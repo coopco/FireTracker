@@ -5,12 +5,10 @@ shortStationNames <- read.csv("data/shortStationNames.csv")
 
 shapes <- readOGR("data/voronoi/voronoi.shp")
 pal <- colorNumeric("YlOrRd", domain = shapes$spice)
-#print(shortStationNames$ShortName[shortStationNames$Name == shapes$stationNam])
 labels <- sprintf("<strong>%s</strong><br/>%g%% risk", 
                   shortStationNames$ShortName[match(shapes$stationNam, shortStationNames$Name)], shapes$spice*100) %>% lapply(htmltools::HTML)
 
 cells_df <- readOGR("data/grid/voronoi.shp")
-#cells_df <- readOGR("data/cells/voronoi.shp")
 cells_pal <- colorNumeric("YlOrRd", domain = c(0,1))
 old_station_name <- "-1"
 clicked_ids <- c()
@@ -27,16 +25,6 @@ basemap <- leaflet(shapes, options = basemapOptions) %>%
   #setView(123, -28, 4.75) %>%
   fitBounds(73, 3.5, 178, -51.5) %>%
   #setMaxBounds(73, 3.5, 178, -51.5) %>%
-  # Add buttons
-  #addEasyButton(easyButton(position = "topright",
-  #  icon="fa-plus", title="Zoom in",
-  #  onClick=JS("function(btn, map) { map.zoomIn(); }"))) %>%
-  #addEasyButton(easyButton(position = "topright",
-  #  icon="fa-minus", title="Zoom out",
-  #  onClick=JS("function(btn, map) { map.zoomOut(); }"))) %>%
-  #addEasyButton(easyButton(position = "topright",
-  #  icon="fa-globe", title="Reset zoom",
-  #  onClick=JS("function(btn, map){ map.flyToBounds(map.fitBounds([[73,3.5],[178,-51.5]])); }"))) %>% # wtf
   addLegend(pal = pal, value = ~spice, opacity = 0.7, title = "Risk", position = "bottomright") %>%
   addPolygons(
     group = "stations",
