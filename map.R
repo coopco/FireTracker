@@ -23,7 +23,7 @@ basemapOptions <- leafletOptions(zoomSnap = 0.25, minZoom = 4.75, doubleClickZoo
 basemap <- leaflet(shapes, options = basemapOptions) %>%
   addProviderTiles(providers$Esri.WorldGrayCanvas) %>%
   #setView(123, -28, 4.75) %>%
-  fitBounds(73, 3.5, 178, -51.5) %>%
+  fitBounds(73, -6.4, 178, -45.4) %>%
   #setMaxBounds(73, 3.5, 178, -51.5) %>%
   addLegend(pal = pal, value = ~spice, opacity = 0.7, title = "Risk", position = "bottomright") %>%
   addPolygons(
