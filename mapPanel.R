@@ -1,4 +1,5 @@
 library(lubridate)
+library(plotly)
 
 weather2020 <- read.csv("data/weather2020.csv")
 weather2020$Date <- as.Date(weather2020$Date)
@@ -6,17 +7,20 @@ monthlyMeans <- read.csv("data/monthlyMeans.csv")
 
 currDate <- Sys.Date()
 
-# TODO change these to html objects
-helpTitle <- "Fire Risk Map"
-helpText <- "This is html describing how the map works."
+helpTitle <- "<h1>&nbsp;Bushfire Risk Map</h1>"
+helpText <- "</br>
+<p>This map shows current predictions of bushfire risk throughout Australia. Each cell represents a forecast for one station.</p>
+<p>We define bushfire risk as ...</p>
+<p>Click on a cell to see a more detailed breakdown of bushfire risk in that station's area.</p>
+"
 
 panel <- absolutePanel(id = "control", fixed = TRUE, width = 400, height ="auto",
                       top = 77, left = 16, right = "auto", bottom = 16,
-          textOutput("helpTitle"),
-          textOutput("helpText"),
+          htmlOutput("helpTitle"),
+          htmlOutput("helpText"),
           uiOutput("panelTitle"),
           htmlOutput("panelText"),
-          plotOutput("panelPlot")
+          plotlyOutput("panelPlot")
         )
 
 mapPanelServer <- function(input, output) {
@@ -28,7 +32,7 @@ mapPanelServer <- function(input, output) {
     newStationName <- shapes$stationNam[event$id]
     shortStationName <- shortStationNames$ShortName[shortStationNames$Name == newStationName]
     # Might be slow, should make faster if need to
-    stationWeather <- weather2020[weather2020$name == newStationName & weather2020$Date+7 >= currDate,]
+    stationWeather <- weather2020[weather2020$name == newStationName & weather2020$Date+4 >= currDate,]
     currWeather <- stationWeather[stationWeather$Date == currDate,]
     
     if (!is.null(event$id)) {
@@ -44,6 +48,7 @@ mapPanelServer <- function(input, output) {
         )
       })
       
+      # TODO compute monthly means based on proportion on which month the previous 30 days fall in
       # Weather text
       stationMeans <- monthlyMeans[monthlyMeans$Station == newStationName & monthlyMeans$Month == month(currDate),]
       tempDiff <- round(currWeather$MaxTemp - stationMeans$MaxTemp, digits=1)
@@ -52,25 +57,51 @@ mapPanelServer <- function(input, output) {
       rainDiff <- round(currWeather$MonthRainMean - stationMeans$Rainfall, digits=1)
       
       # Panel text
-      # fa-temperature-high fa-wind fa-tint fa-cloud-showers-heavy
-      # 
       output$panelText <- renderText(paste(tempDiff, windDiff, humidityDiff, rainDiff))
       output$panelText <- renderUI({
         # TODO add plus signs to positive diffs
-        tempText <-     paste("<h3 style='display: inline'>",icon('temperature-high'),paste(currWeather$MaxTemp,'\u00b0',sep=""),"</h3>",'&nbsp;&nbsp;(',tempDiff,')')
-        windText <-     paste("<h3 style='display: inline'>",icon('wind'),currWeather$WindSpeed,"</h3>",'km/h &nbsp;&nbsp;(',windDiff,')')
-        humidityText <- paste("<h3 style='display: inline'>",icon('tint'),paste(currWeather$Humidity,'%',sep=""),"</h3>",'humidity &nbsp;&nbsp;(',paste(humidityDiff,'%',sep=""),')')
-        rainText <-     paste("<h3 style='display: inline'>",icon('cloud-showers-heavy'),currWeather$Rainfall,"</h3>",'mm &nbsp;&nbsp;(',rainDiff,')')
-        str1 <- paste(paste("</br>&nbsp;&nbsp;&nbsp;&nbsp",tempText), windText, humidityText, rainText, "", sep="</br></br>&nbsp;&nbsp;&nbsp;&nbsp;")
+        if (tempDiff >= 0) {
+          tempText <- paste(tempDiff, "above average")
+        } else {
+          tempText <- paste(abs(tempDiff), "below average")
+        }
+        if (windDiff >= 0) {
+          windText <- paste(windDiff, "above average")
+        } else {
+          windText <- paste(abs(windDiff), "below average")
+        }
+        if (humidityDiff >= 0) {
+          humidityText <- paste(humidityDiff, "above average")
+        } else {
+          humidityText <- paste(paste(abs(humidityDiff),'%',sep=""), "below average")
+        }
+        if (rainDiff >= 0) {
+          rainText <- paste(rainDiff, "above average")
+        } else {
+          rainText <- paste(abs(rainDiff), "below average")
+        }
+        tempText <-     paste("<h3 style='display: inline'>",icon('temperature-high'),paste(round(currWeather$MaxTemp,digits=1),'\u00b0',sep=""),"</h3>",'max &nbsp;&nbsp;(',tempText,')**')
+        windText <-     paste("<h3 style='display: inline'>",icon('wind'),round(currWeather$WindSpeed,digits=1),"</h3>",'km/h &nbsp;&nbsp;(',windText,')**')
+        humidityText <- paste("<h3 style='display: inline'>",icon('tint'),paste(round(currWeather$Humidity,digits=1),'%',sep=""),"</h3>",'humidity &nbsp;&nbsp;(',humidityText,')**')
+        rainText <-     paste("<h3 style='display: inline'>",icon('cloud-showers-heavy'),paste(round(currWeather$MonthRainMean,digits=1),'*',sep=""),"</h3>",'mm &nbsp;&nbsp;(',rainText,')**')
+        #rainText <- paste(rainText, "</br>&nbsp;&nbsp;&nbsp;&nbsp;*average over last 30 days")
+        str1 <- paste(paste("</br>&nbsp;&nbsp;&nbsp;&nbsp",tempText), windText, humidityText, rainText, sep="</br></br>&nbsp;&nbsp;&nbsp;&nbsp;")
+        str1 <- paste(str1, "</br></br>&nbsp;*&nbsp; Average over last 30 days</br>&nbsp;** Values compared to long-term monthly averages</br></br>")
         HTML(paste(str1))
         })
       # Risk plot
       veg <- shapes$vegetation[event$id]
       colName <- paste("Prediction", veg, sep="")
-      output$panelPlot <- renderPlot(ggplot(data=stationWeather, aes_string(x="Date", y=colName)) 
-                                     + geom_line(color="red") + geom_point() + ylim(0, 1) 
-                                     + labs(title = paste("Bushfire Risk", shortStationName), x="Date", y="Risk") 
-                                     + theme(plot.title = element_text(hjust=0.5)))
+      plot <- ggplot(data=stationWeather, aes_string(x="Date", y=colName))+#, 
+                                                     #Temperature=stationWeather$MaxTemp, Wind=stationWeather$WindSpeed, 
+                                                     #Humidity=stationWeather$Humidity, Rainfall=stationWeather$Rainfall)) +
+              geom_line(color="red") + geom_point() + ylim(0, 1) +
+              labs(title = paste("Bushfire Risk:", shortStationName), x="Date", y="Risk") +
+              theme(plot.title = element_text(hjust=0.5))
+      
+      output$panelPlot <- renderPlotly(ggplotly(plot) %>%
+                                       config(displayModeBar=F) %>%
+                                       layout(xaxis = list(fixedrange=T), yaxis = list(fixedrange=T)))
     }
   })
   

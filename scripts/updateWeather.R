@@ -16,6 +16,7 @@ for (i in 1:nrow(stations)) {
     print(i)
     lat <- stations$lat[i]
     lon <- stations$long[i]
+    stationWeather <- weather[weather$name == stations$name[i],]
     # TODO figure out how to get rain for current day -- use forecast for now
     #current <- get_current(lat=lat, lon=lon)
     #curr_hours <- as.POSIXlt(current)
@@ -30,7 +31,7 @@ for (i in 1:nrow(stations)) {
         Humidity <- min(day_forecast$main.humidity[hours==9 | hours==15])
         WindSpeed <- max(day_forecast$wind.speed[hours==9 | hours==15])*3.6
         
-        row <- weather[weather$name == stations$name[i] & weather$Date == "2020-09-29",]
+        row <- stationWeather[weather$Date == "2020-09-29",]
         weekBefore <- currDate-7
         monthBefore <- currDate-30
         yearBefore <- currDate-365
@@ -39,21 +40,47 @@ for (i in 1:nrow(stations)) {
         row$Rainfall <- Rainfall
         row$WindSpeed <- WindSpeed
         row$Humidity <- Humidity
-        row$WeekMaxTempMean <- mean(weather[weather$Date >= weekBefore,]$MaxTemp)
-        row$WeekRainMean <- mean(weather[weather$Date >= weekBefore,]$Rainfall)
-        row$WeekWindMean <- mean(weather[weather$Date >= weekBefore,]$WindSpeed)
-        row$WeekHumidityMean <- mean(weather[weather$Date >= weekBefore,]$Humidity)
-        row$MonthMaxTempMean <-  mean(weather[weather$Date >= monthBefore,]$MaxTemp)
-        row$MonthRainMean <- mean(weather[weather$Date >= monthBefore,]$Rainfall)
-        row$MonthWindMean <- mean(weather[weather$Date >= monthBefore,]$WindSpeed)
-        row$MonthHumidityMean <- mean(weather[weather$Date >= monthBefore,]$Humidity)
-        row$YearMaxTempMean <- mean(weather[weather$Date >= yearBefore,]$MaxTemp)
-        row$YearRainMean <- mean(weather[weather$Date >= yearBefore,]$Rainfall)
-        row$YearWindMean <- mean(weather[weather$Date >= yearBefore,]$WindSpeed)
-        row$YearHumidityMean <- mean(weather[weather$Date >= yearBefore,]$Humidity)
+        row$WeekMaxTempMean <- mean(stationWeather[stationWeather$Date >= weekBefore,]$MaxTemp)
+        row$WeekRainMean <- mean(stationWeather[stationWeather$Date >= weekBefore,]$Rainfall)
+        row$WeekWindMean <- mean(stationWeather[stationWeather$Date >= weekBefore,]$WindSpeed)
+        row$WeekHumidityMean <- mean(stationWeather[stationWeather$Date >= weekBefore,]$Humidity)
+        row$MonthMaxTempMean <-  mean(stationWeather[stationWeather$Date >= monthBefore,]$MaxTemp)
+        row$MonthRainMean <- mean(stationWeather[stationWeather$Date >= monthBefore,]$Rainfall)
+        row$MonthWindMean <- mean(stationWeather[stationWeather$Date >= monthBefore,]$WindSpeed)
+        row$MonthHumidityMean <- mean(stationWeather[stationWeather$Date >= monthBefore,]$Humidity)
+        row$YearMaxTempMean <- mean(stationWeather[stationWeather$Date >= yearBefore,]$MaxTemp)
+        row$YearRainMean <- mean(stationWeather[stationWeather$Date >= yearBefore,]$Rainfall)
+        row$YearWindMean <- mean(stationWeather[stationWeather$Date >= yearBefore,]$WindSpeed)
+        row$YearHumidityMean <- mean(stationWeather[stationWeather$Date >= yearBefore,]$Humidity)
         weather <- rbind(weather, row)
     }
 }
+
+## Recompute means because I messed up the code for the last week
+#for (i in 1:nrow(stations)) {
+#    print(i)
+#    station <- stations$name[i]
+#    stationWeather <- weather[weather$name == station,]
+#    for (j in 0:5) {
+#        date = as.Date("2020-10-11")+j
+#        
+#        weekBefore <- date-7
+#        monthBefore <- date-30
+#        yearBefore <- date-365
+#        weather$WeekMaxTempMean[weather$name == station & weather$Date == date] <- mean(stationWeather[stationWeather$Date >= weekBefore & stationWeather$Date < date,]$MaxTemp)
+#        weather$WeekRainMean[weather$name == station & weather$Date == date] <- mean(stationWeather[stationWeather$Date >= weekBefore & stationWeather$Date < date,]$Rainfall)
+#        weather$WeekWindMean[weather$name == station & weather$Date == date] <- mean(stationWeather[stationWeather$Date >= weekBefore & stationWeather$Date < date,]$WindSpeed)
+#        weather$WeekHumidityMean[weather$name == station & weather$Date == date] <- mean(stationWeather[stationWeather$Date >= weekBefore & stationWeather$Date < date,]$Humidity)
+#        weather$MonthMaxTempMean[weather$name == station & weather$Date == date] <-  mean(stationWeather[stationWeather$Date >= monthBefore & stationWeather$Date < date,]$MaxTemp)
+#        weather$MonthRainMean[weather$name == station & weather$Date == date] <- mean(stationWeather[stationWeather$Date >= monthBefore & stationWeather$Date < date,]$Rainfall)
+#        weather$MonthWindMean[weather$name == station & weather$Date == date] <- mean(stationWeather[stationWeather$Date >= monthBefore & stationWeather$Date < date,]$WindSpeed)
+#        weather$MonthHumidityMean[weather$name == station & weather$Date == date] <- mean(stationWeather[stationWeather$Date >= monthBefore & stationWeather$Date < date,]$Humidity)
+#        weather$YearMaxTempMean[weather$name == station & weather$Date == date] <- mean(stationWeather[stationWeather$Date >= yearBefore & stationWeather$Date < date,]$MaxTemp)
+#        weather$YearRainMean[weather$name == station & weather$Date == date] <- mean(stationWeather[stationWeather$Date >= yearBefore & stationWeather$Date < date,]$Rainfall)
+#        weather$YearWindMean[weather$name == station & weather$Date == date] <- mean(stationWeather[stationWeather$Date >= yearBefore & stationWeather$Date < date,]$WindSpeed)
+#        weather$YearHumidityMean[weather$name == station & weather$Date == date] <- mean(stationWeather[stationWeather$Date >= yearBefore & stationWeather$Date < date,]$Humidity)
+#    }
+#}
 
 # Make predictions
 library(keras)
@@ -69,7 +96,6 @@ for (i in 0:34) {
 
 write.csv(weather, "data/weather2020.csv", row.names=FALSE)
 
-
 # Update shapefiles
 library(rgdal)
 currWeather <- weather[weather$Date == currDate,]
@@ -81,7 +107,6 @@ for (i in 1:length(cells)) {
     cells$spice[i] <- currWeather[currWeather$name == stationName, colNum]
 }
 
-# TODO delete previous file
 writeOGR(cells, dsn="data/grid", layer="voronoi", driver="ESRI Shapefile", overwrite_layer = T)
 
 voronoi <- readOGR("data/voronoi/voronoi.shp")
