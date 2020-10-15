@@ -11,7 +11,7 @@ helpTitle <- "<h1>&nbsp;Bushfire Risk Map</h1>"
 helpText <- "</br>
 <p>This map shows current predictions of bushfire risk throughout Australia. Each cell represents a forecast for one station.</p>
 <p>Click on a cell to see a more detailed breakdown of bushfire risk in that station's area.</p>
-<p>Bold/highlighted disclaimer -- always prioritise government reccomendations -- links?</p>
+<p><b>DISCLAIMER:</b> This is not supposed to override government advice. Please always consult your local authority before making decisions. Links to each states official government advice can be found on the home page</p>
 <p>Reccomendations of how a user should interpret different levels of risk</p>
 "
 
