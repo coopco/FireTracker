@@ -12,7 +12,7 @@ helpText <- "</br>
 <p>This map shows current predictions of bushfire risk throughout Australia. Each cell represents a forecast for one station.</p>
 <p>Click on a cell to see a more detailed breakdown of bushfire risk in that station's area.</p>
 <p><b>DISCLAIMER:</b> This is not supposed to override government advice. Please always consult your local authority before making decisions. Links to each states official government advice can be found on the home page</p>
-<p>Reccomendations of how a user should interpret different levels of risk</p>
+<p>Risk Level</br>Very Low and Low</br>Be aware of your bushfire plan and monitor the situation closely. Unlikely to need immediate attention<br>Moderate</br>Leaving early is always the safest option. Please check government advice.</br>High and Very High</br>Please immediately seek government advice. Fire risk is high and your bushfire plan should be followed.</p>
 "
 
 panel <- absolutePanel(id = "control", fixed = TRUE, width = 400, height ="auto",
