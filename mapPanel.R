@@ -11,12 +11,12 @@ helpTitle <- "<h1>&nbsp;Bushfire Risk Map</h1>"
 helpText <- "</br>
 <p>This map shows current predictions of bushfire risk throughout Australia. Each cell represents a forecast for one station.</p>
 <p>Click on a cell to see a more detailed breakdown of bushfire risk in that station's area.</p>
-<p>Bold/highlighted disclaimer -- always prioritise government reccomendations -- links?</p>
-<p>Reccomendations of how a user should interpret different levels of risk</p>
+<p><b>DISCLAIMER:</b> This is not supposed to override government advice. Please always consult your local authority before making decisions. Links to each states official government advice can be found on the home page</p>
+<p><br><h4>Risk Level</h4><b>Very Low and Low</b></br>Be aware of your bushfire plan and monitor the situation closely. Unlikely to need immediate attention<br><b>Moderate</b></br>Leaving early is always the safest option. Please check government advice.</br><b>High and Very High</b></br>Please immediately seek government advice. Fire risk is high and your bushfire plan should be followed.</p>
 "
 
 panel <- absolutePanel(id = "control", fixed = TRUE, width = 400, height ="auto",
-                      top = 77, left = 16, right = "auto", bottom = 16,
+                      top = 77, left = 16, right = "auto", bottom = 16, style = "overflow-y: auto; overflow-x: hidden",
           htmlOutput("helpTitle"),
           htmlOutput("helpText"),
           uiOutput("panelTitle"),
