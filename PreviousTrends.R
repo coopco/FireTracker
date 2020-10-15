@@ -2,7 +2,7 @@ nFires <- read.csv("data/CorrelationData.csv")
 nFires$Date <- as.Date(nFires$Date)
 
 TrendsTab <- tabPanel("Previous Trends", tabName = "previoustrends",
-                      div(h2("Previous Trends"), 
+                      div(h1("Previous Trends", align="center"), 
                           #tabs to select data in graph
                           selectInput("State", "State:",
                                       c("All" = "ALL",
