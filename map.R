@@ -3,15 +3,23 @@ source("mapPanel.R", local=TRUE)
 vegetation_names <- read.csv("data/vegetation_names.csv")
 shortStationNames <- read.csv("data/shortStationNames.csv")
 
+# For binning
+breaks <- c(0, 0.2, 0.4, 0.6, 0.8, 1)
+class_names <- c("Very Low", "Low", "Moderate", "High", "Very high")
+
 shapes <- readOGR("data/voronoi/voronoi.shp")
 pal <- colorBin("YlOrRd", c(0,1), bins=5)
 #pal <- colorNumeric("YlOrRd", domain = shapes$spice)
-labels <- sprintf("<strong>%s</strong><br/>%g%% risk", 
-                  shortStationNames$ShortName[match(shapes$stationNam, shortStationNames$Name)], shapes$spice*100) %>% lapply(htmltools::HTML)
+shapes$class <- cut(shapes$spice, breaks=breaks, labels=class_names)
+labels <- sprintf("<strong>%s</strong><br/>%s risk (%g)", 
+                  shortStationNames$ShortName[match(shapes$stationNam, shortStationNames$Name)], shapes$class, round(shapes$spice,digits=2)) %>% lapply(htmltools::HTML)
 
 cells_df <- readOGR("data/grid/voronoi.shp")
-old_station_name <- "-1"
+cells_df$class <- cut(cells_df$spice, breaks=breaks, labels=class_names)
 clicked_ids <- c()
+
+
+old_station_name <- "-1"
 #labels <- sprintf("<strong>%s</strong><br/>%g%% risk", shapes$id, shapes$vegetation*100) %>% lapply(htmltools::HTML)
 
 focused <- FALSE
@@ -25,7 +33,7 @@ basemap <- leaflet(shapes, options = basemapOptions) %>%
   #setView(123, -28, 4.75) %>%
   fitBounds(73, -6.4, 178, -45.4) %>%
   #setMaxBounds(73, 3.5, 178, -51.5) %>%
-  addLegend(pal = pal, value = ~spice, opacity = 0.7, title = "Risk", position = "bottomright") %>%
+  addLegend(pal = pal, value = ~spice, opacity = 0.7, title = "Risk", position = "bottomright", labFormat=function(type, cuts, p){paste0(class_names)}) %>%
   addPolygons(
     group = "stations",
     layerId = 1:length(shapes),
@@ -87,14 +95,13 @@ mapServer <- function(input, output) {
     } else {
       clicked_ids <<- c(clicked_ids, event$id)
       cells <- cells_df[cells_df$id == event$id,]
-      cell_labels <- sprintf("<strong>%s</strong><br/>%g%% risk", vegetation_names$Name[cells$vegetation+1], cells$spice*100) %>% lapply(htmltools::HTML)
-      bbox <- shapes[event$id,]@bbox
       
-      cells$spice2 = shapes$spice[event$id] * cells$spice/sum(cells$spice)
+      cell_labels <- sprintf("<strong>%s</strong><br/>%s risk (%g)", vegetation_names$Name[cells$vegetation+1], cells$class, round(cells$spice,digits=2)) %>% lapply(htmltools::HTML)
+      bbox <- shapes[event$id,]@bbox
       
       leafletProxy("map", data=cells) %>% addPolygons(
         group = new_station_name,
-        fillColor = ~pal(spice), #TODO change
+        fillColor = ~pal(spice),
         weight = 2,
         opacity = 1,
         color = "white",

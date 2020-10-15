@@ -10,8 +10,9 @@ currDate <- Sys.Date()
 helpTitle <- "<h1>&nbsp;Bushfire Risk Map</h1>"
 helpText <- "</br>
 <p>This map shows current predictions of bushfire risk throughout Australia. Each cell represents a forecast for one station.</p>
-<p>We define bushfire risk as ...</p>
 <p>Click on a cell to see a more detailed breakdown of bushfire risk in that station's area.</p>
+<p>Bold/highlighted disclaimer -- always prioritise government reccomendations -- links?</p>
+<p>Reccomendations of how a user should interpret different levels of risk</p>
 "
 
 panel <- absolutePanel(id = "control", fixed = TRUE, width = 400, height ="auto",
@@ -92,14 +93,17 @@ mapPanelServer <- function(input, output) {
       # Risk plot
       veg <- shapes$vegetation[event$id]
       colName <- paste("Prediction", veg, sep="")
-      plot <- ggplot(data=stationWeather, aes_string(x="Date", y=colName))+#, 
-                                                     #Temperature=stationWeather$MaxTemp, Wind=stationWeather$WindSpeed, 
-                                                     #Humidity=stationWeather$Humidity, Rainfall=stationWeather$Rainfall)) +
-              geom_line(color="red") + geom_point() + ylim(0, 1) +
+      
+      # TODO highlight current day
+      plot <- ggplot(data=stationWeather, aes_string(x="Date", y=colName, 
+                                                     Temperature=stationWeather$MaxTemp, Wind=stationWeather$WindSpeed, 
+                                                     Humidity=stationWeather$Humidity, Rainfall=stationWeather$Rainfall,
+                                                     Date=stationWeather$Date, Risk=round(stationWeather[,colName],digits=2))) +
+              geom_line(color="red") + geom_point() + ylim(0,1) + 
               labs(title = paste("Bushfire Risk:", shortStationName), x="Date", y="Risk") +
               theme(plot.title = element_text(hjust=0.5))
       
-      output$panelPlot <- renderPlotly(ggplotly(plot) %>%
+      output$panelPlot <- renderPlotly(ggplotly(plot, tooltip = c("Risk", "Temperature", "Rainfall", "Humidity", "Wind")) %>%
                                        config(displayModeBar=F) %>%
                                        layout(xaxis = list(fixedrange=T), yaxis = list(fixedrange=T)))
     }
