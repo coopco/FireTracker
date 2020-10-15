@@ -31,7 +31,7 @@ for (i in 1:nrow(stations)) {
         Humidity <- min(day_forecast$main.humidity[hours==9 | hours==15])
         WindSpeed <- max(day_forecast$wind.speed[hours==9 | hours==15])*3.6
         
-        row <- stationWeather[weather$Date == "2020-09-29",]
+        row <- stationWeather[stationWeather$Date == "2020-09-29",]
         weekBefore <- currDate-7
         monthBefore <- currDate-30
         yearBefore <- currDate-365

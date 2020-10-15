@@ -4,12 +4,12 @@ vegetation_names <- read.csv("data/vegetation_names.csv")
 shortStationNames <- read.csv("data/shortStationNames.csv")
 
 shapes <- readOGR("data/voronoi/voronoi.shp")
-pal <- colorNumeric("YlOrRd", domain = shapes$spice)
+pal <- colorBin("YlOrRd", c(0,1), bins=5)
+#pal <- colorNumeric("YlOrRd", domain = shapes$spice)
 labels <- sprintf("<strong>%s</strong><br/>%g%% risk", 
                   shortStationNames$ShortName[match(shapes$stationNam, shortStationNames$Name)], shapes$spice*100) %>% lapply(htmltools::HTML)
 
 cells_df <- readOGR("data/grid/voronoi.shp")
-cells_pal <- colorNumeric("YlOrRd", domain = c(0,1))
 old_station_name <- "-1"
 clicked_ids <- c()
 #labels <- sprintf("<strong>%s</strong><br/>%g%% risk", shapes$id, shapes$vegetation*100) %>% lapply(htmltools::HTML)
@@ -94,7 +94,7 @@ mapServer <- function(input, output) {
       
       leafletProxy("map", data=cells) %>% addPolygons(
         group = new_station_name,
-        fillColor = ~cells_pal(spice), #TODO change
+        fillColor = ~pal(spice), #TODO change
         weight = 2,
         opacity = 1,
         color = "white",

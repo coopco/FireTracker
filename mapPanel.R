@@ -48,18 +48,18 @@ mapPanelServer <- function(input, output) {
         )
       })
       
-      # TODO compute monthly means based on proportion on which month the previous 30 days fall in
       # Weather text
-      stationMeans <- monthlyMeans[monthlyMeans$Station == newStationName & monthlyMeans$Month == month(currDate),]
-      tempDiff <- round(currWeather$MaxTemp - stationMeans$MaxTemp, digits=1)
-      windDiff <- round(currWeather$WindSpeed - stationMeans$WindSpeed, digits=1)
-      humidityDiff <- round(currWeather$Humidity - stationMeans$Humidity, digits=1)
-      rainDiff <- round(currWeather$MonthRainMean - stationMeans$Rainfall, digits=1)
+      month1 <- monthlyMeans[monthlyMeans$Station == newStationName & monthlyMeans$Month == month(currDate),]
+      month2 <- monthlyMeans[monthlyMeans$Station == newStationName & monthlyMeans$Month == month(currDate)-1,]
+      currDay <- day(currDate)
+      tempDiff <- round(currWeather$MaxTemp - month1$MaxTemp*currDay/30 - month2$MaxTemp*(30-currDay)/30, digits=1)
+      windDiff <- round(currWeather$WindSpeed - month1$WindSpeed*currDay/30 - month2$WindSpeed*(30-currDay)/30, digits=1)
+      humidityDiff <- round(currWeather$Humidity - month1$Humidity*currDay/30 - month2$Humidity*(30-currDay)/30, digits=1)
+      rainDiff <- round(currWeather$MonthRainMean - month1$Rainfall*currDay/30 - month2$Rainfall*(30-currDay)/30, digits=1)
       
       # Panel text
       output$panelText <- renderText(paste(tempDiff, windDiff, humidityDiff, rainDiff))
       output$panelText <- renderUI({
-        # TODO add plus signs to positive diffs
         if (tempDiff >= 0) {
           tempText <- paste(tempDiff, "above average")
         } else {
