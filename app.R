@@ -22,6 +22,7 @@ ui <- bootstrapPage(
 )
 
 server <- function(input, output) {
+  homeTabServer(input,output)
   mapServer(input, output)
   TrendsServer(input,output)  
 }
