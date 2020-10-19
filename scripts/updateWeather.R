@@ -1,3 +1,5 @@
+setwd("/home/rstudio/ShinyApps/FireTracker")
+#setwd
 weather <- read.csv("data/weather2020.csv")
 stations <- read.csv("data/acorn_sat_stations.csv")
 weather$Date <- as.Date(weather$Date)
