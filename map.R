@@ -25,8 +25,7 @@ old_station_name <- "-1"
 focused <- FALSE
 
 # TODO disable scroll wheel zoom
-basemapOptions <- leafletOptions(zoomSnap = 0.25, minZoom = 4.75, doubleClickZoom = FALSE, scrollWheelZoom = FALSE,
-                                 zoomControl = FALSE)
+basemapOptions <- leafletOptions(zoomSnap = 0.25, doubleClickZoom = FALSE, zoomControl = FALSE)
 
 basemap <- leaflet(shapes, options = basemapOptions) %>%
   addProviderTiles(providers$Esri.WorldGrayCanvas) %>%
