@@ -1,3 +1,6 @@
+### Home page
+
+# HTML strings for home page text
 welcomeText <- "<h1><center>Welcome to Bushfire Tracker</center></h1><br>"
 
 introText <- "<p>Bushfire are a significant issue that plagues the Australian public; this website aims to provide clear information and predictions about fire risk across the country.<br><br>
@@ -26,6 +29,7 @@ linkText <- '<br><h4><b>Links to Government Fire Warnings</b></h4>
             <a href="https://www.ruralfire.qld.gov.au/map/Pages/default.aspx">Queensland</a></br>
             <a href="https://pfes.nt.gov.au/fire-and-rescue-service/fire-incident-map">Northern Territory</a><br>'
 
+# Tab
 homeTab <- tabPanel("Home", tabName = "home",
                       htmlOutput("welcomeText"),
                           htmlOutput("introText"),
@@ -33,6 +37,7 @@ homeTab <- tabPanel("Home", tabName = "home",
                           htmlOutput("linkText")
                           )    
 
+# Server function
 homeTabServer <- function(input, output) {
   output$welcomeText <- renderText(welcomeText)
   output$introText <- renderText(introText)

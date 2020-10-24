@@ -1,38 +1,45 @@
+### Code for risk map
+
+# Create the map panel
 source("mapPanel.R", local=TRUE)
 
-vegetation_names <- read.csv("data/vegetation_names.csv")
+# Shortened station name, so that they fit on one line
 shortStationNames <- read.csv("data/shortStationNames.csv")
+# To map vegetation numbers to descriptions
+vegetation_names <- read.csv("data/vegetation_names.csv")
 
-# For binning
+# Breaks for the different risk classes
 breaks <- c(0, 0.2, 0.4, 0.6, 0.8, 1)
 class_names <- c("Very Low", "Low", "Moderate", "High", "Very high")
 
+# Read station shapes
 shapes <- readOGR("data/voronoi/voronoi.shp")
-pal <- colorBin("YlOrRd", c(0,1), bins=5)
-#pal <- colorNumeric("YlOrRd", domain = shapes$spice)
-shapes$class <- cut(shapes$spice, breaks=breaks, labels=class_names)
+pal <- colorBin("YlOrRd", c(0,1), bins=5) # Define colour scheme
+shapes$class <- cut(shapes$spice, breaks=breaks, labels=class_names) # Sort risks into classes
+# Create strings for tooltips
 labels <- sprintf("<strong>%s</strong><br/>%s risk (%g)", 
                   shortStationNames$ShortName[match(shapes$stationNam, shortStationNames$Name)], shapes$class, round(shapes$spice,digits=2)) %>% lapply(htmltools::HTML)
 
+# Read grid cells
 cells_df <- readOGR("data/grid/voronoi.shp")
-cells_df$class <- cut(cells_df$spice, breaks=breaks, labels=class_names)
+cells_df$class <- cut(cells_df$spice, breaks=breaks, labels=class_names) # Sort risks into classes
+# List of stations that have already been clicked, to avoid duplicating cell shape objects
 clicked_ids <- c()
+old_station_name <- "-1" # Placeholder
+focused <- FALSE # Is a station currently focused?
 
-
-old_station_name <- "-1"
-#labels <- sprintf("<strong>%s</strong><br/>%g%% risk", shapes$id, shapes$vegetation*100) %>% lapply(htmltools::HTML)
-
-focused <- FALSE
-
-# TODO disable scroll wheel zoom
+# Options for Leaflet
 basemapOptions <- leafletOptions(zoomSnap = 0.25, doubleClickZoom = FALSE, zoomControl = FALSE)
 
+# Create leaflet object
 basemap <- leaflet(shapes, options = basemapOptions) %>%
-  addProviderTiles(providers$Esri.WorldGrayCanvas) %>%
-  #setView(123, -28, 4.75) %>%
-  fitBounds(73, -6.4, 178, -45.4) %>%
-  #setMaxBounds(73, 3.5, 178, -51.5) %>%
-  addLegend(pal = pal, value = ~spice, opacity = 0.7, title = "Risk", position = "bottomright", labFormat=function(type, cuts, p){paste0(class_names)}) %>%
+  addProviderTiles(providers$Esri.WorldGrayCanvas) %>% # World tiles
+  fitBounds(73, -6.4, 178, -45.4) %>% # Rough bounds of Australia
+  #setMaxBounds(73, 3.5, 178, -51.5) %>% # This is unreliable at different resolutions
+  # Create legend
+  addLegend(pal = pal, value = ~spice, opacity = 0.7, title = "Risk", position = "bottomright",
+            labFormat=function(type, cuts, p){paste0(class_names)}) %>% # Weird hack to get class names as labels
+  # Add station shapes, with styling and tooltips
   addPolygons(
     group = "stations",
     layerId = 1:length(shapes),
@@ -57,6 +64,7 @@ basemap <- leaflet(shapes, options = basemapOptions) %>%
     )
   )
 
+# Create tab, and container for map
 mapTab <- tabPanel("Risk map",
       div(class="outer",
         tags$head(includeCSS("styles.css")),
@@ -65,20 +73,19 @@ mapTab <- tabPanel("Risk map",
       )
     )
 
+# Server function for leaflet map
 mapServer <- function(input, output) {
+  # Map output
   output$map <- renderLeaflet({
     basemap
   })
   
-  output$text <- renderText ({
-    event <- input$map_shape_click
-    if (!is.null(event)) {
-      sprintf("%s has been selected", shapes$stationNam[event$id])
-    } 
-  })
-  
+  # Store name of clicked station
+  # TODO Is this necessary
+  # TODO comment rest of file
   output$focused <- reactive({input$map_shape_click$group}) 
   
+  # When a shape is clicked
   mapClickEvent <- observeEvent(input$map_shape_click, {
     event <- input$map_shape_click
     new_station_name <- shapes$stationNam[event$id]

@@ -1,4 +1,5 @@
-weather <- read.csv("data/weather2020.csv")
+### Cleans the weather data for 2020 
+weather <- read.csv("data/weather2020.csv") # TODO Update path
 stations <- read.csv("data/acorn_sat_stations.csv")
 weather$date_time <- as.Date(weather$date_time)
 
@@ -34,6 +35,7 @@ for (i in 1:nrow(stations)) {
     stationWeather <- weather[weather$name == station,]
     
     # yes i know this is bad
+    # Script was run on 2020-10-10
     currWeather[currWeather$name == station,]$WeekMaxTempMean <- mean(stationWeather[stationWeather$Date >= "2020-10-03",]$MaxTemp)
     currWeather[currWeather$name == station,]$WeekRainMean <- mean(stationWeather[stationWeather$Date >= "2020-10-03",]$Rainfall)
     currWeather[currWeather$name == station,]$WeekHumidityMean <- mean(stationWeather[stationWeather$Date >= "2020-10-03",]$Humidity)
@@ -46,18 +48,6 @@ for (i in 1:nrow(stations)) {
     currWeather[currWeather$name == station,]$YearRainMean <- mean(stationWeather$Rainfall[stationWeather$Date >= "2019-10-10"])
     currWeather[currWeather$name == station,]$YearHumidityMean <- mean(stationWeather$Humidity[stationWeather$Date >= "2019-10-10"])
     currWeather[currWeather$name == station,]$YearWindMean <- mean(stationWeather$WindSpeed[stationWeather$Date >= "2019-10-10"])
-    #currWeather$PrevWeekMaxTemp[currWeather$name == station,] <- stationWeather[stationWeather$Date == "2020-09-22"]$MaxTemp
-    #currWeather$PrevWeekRain[currWeather$name == station,] <- stationWeather[stationWeather$Date == "2020-09-22"]$Rainfall
-    #currWeather$PrevWeekWind[currWeather$name == station,] <- stationWeather[stationWeather$Date == "2020-09-22"]$WindSpeed
-    #currWeather$PrevWeekHumidity[currWeather$name == station,] <- stationWeather[stationWeather$Date == "2020-09-22"]$Humidity
-    #currWeather$PrevMonthMaxTemp[currWeather$name == station,] <- stationWeather[stationWeather$Date == "2020-08-29"]$MaxTemp
-    #currWeather$PrevMonthRain[currWeather$name == station,] <- stationWeather[stationWeather$Date == "2020-08-29"]$Rainfall
-    #currWeather$PrevMonthWind[currWeather$name == station,] <- stationWeather[stationWeather$Date == "2020-08-29"]$WindSpeed
-    #currWeather$PrevMonthHumidity[currWeather$name == station,] <- stationWeather[stationWeather$Date == "2020-08-29"]$Humidity
-    #currWeather$PrevYearMaxTemp[currWeather$name == station,] <- stationWeather[stationWeather$Date == "2019-10-01"]$MaxTemp
-    #currWeather$PrevYearRain[currWeather$name == station,] <- stationWeather[stationWeather$Date == "2019-10-01"]$Rainfall
-    #currWeather$PrevYearWind[currWeather$name == station,] <- stationWeather[stationWeather$Date == "2019-10-01"]$WindSpeed
-    #currWeather$PrevYearHumidity[currWeather$name == station,] <- stationWeather[stationWeather$Date == "2019-10-01"]$Humidity
 }
 
 #currWeather <- currWeather[,c(5, 4, 2, 3, 6:17)]
