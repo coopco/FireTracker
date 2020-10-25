@@ -4,7 +4,7 @@
 library(lubridate)
 library(plotly) # Interactive graph
 
-# Read data
+# Weather data and predictions for 2020
 weather2020 <- read.csv("data/weather2020.csv")
 weather2020$Date <- as.Date(weather2020$Date)
 # Used to compare current weather to monthly averages

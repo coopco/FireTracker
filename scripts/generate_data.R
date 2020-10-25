@@ -1,3 +1,6 @@
+### Randomly generates points with no fire to use as training data
+### Retrieves weather information for each point
+
 fires <- read.csv("Datasets/fires_nice.csv")
 weather <- read.csv("Datasets/cleanedWeather.csv")
 stations <- read.csv("Datasets/stationLocations.csv")

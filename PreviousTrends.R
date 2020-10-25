@@ -1,6 +1,6 @@
-### Code for Previout Trends tab
+### Code for Previous Trends tab
 
-# Read fire data
+# Fires grouped by station and date
 nFires <- read.csv("data/CorrelationData.csv")
 nFires$Date <- as.Date(nFires$Date)
 

@@ -1,5 +1,10 @@
-# Must convert each station cell to its own shapefile for use in voronoiShapefile
+### Creates grid of cells for every stations shape
+### Vegetation data obtained from the DLCDv2.1 dataset
+###     https://www.abs.gov.au/ausstats/abs@.nsf/0/0B0A11102885339BCA257BD400157E61?Opendocument
+### Station data obtained from ACORN-SAT dataset from Bureau of Meteorology
+
 library(raster)
+source("scripts/voronoi-shapefile.R")
 
 vegetation <- raster("Data/vegetation.gpkg")
 stations <- read.csv("Data/acorn_sat_stations.csv")
@@ -10,7 +15,7 @@ maxLat <- -10.6681857235
 minLon <- 113.338953078
 maxLon <- 153.569469029
 
-n <- 20000
+n <- 20000 # Number of cells
 lons <- c()
 lats <- c()
 vegs <- c()
@@ -18,7 +23,8 @@ vegs <- c()
 # Could make this faster
 # Takes very long time to run as is
 for (i in 1:n) {
-    if (i%%100 == 0) print(i)
+    # Generates all points in the grid
+    if (i%%100 == 0) print(i) # Print progress
     veg <- NA
     
     while (is.na(veg)) {
@@ -35,13 +41,14 @@ for (i in 1:n) {
     vegs <- c(vegs, veg)
 }
         
-# Make uniform grid. Probably technically better, but voronoi diagrams look cooler
+# Make uniform grid.
 lons <- seq(minLon, maxLon, length.out=100)
 lats <- seq(minLat, maxLat, length.out=82)
 points <- expand.grid(lons, lats)
 lons <- c()
 lats <- c()
 vegs <- c()
+# Get lat, long, and vegetation for each grid cell
 for (i in 1:nrow(points)) {
     if (i%%100 == 0) print(i)
     lon <- points$Var1[i]
@@ -55,23 +62,19 @@ for (i in 1:nrow(points)) {
         vegs <- c(vegs, veg)
     }
 }
+
+# Create shapefile from grid cells
 cells <- voronoiShapefile(lons, lats, station_shapes)
 
 # Plot points to check that it works
 plot(lons, lats)
 
 library(rgdal)
-source("scripts/voronoi-shapefile.R")
 station_shapes <- readOGR("data/voronoi/voronoi.shp")
 
 lons_save <- lons
 lats_save <- lats
 vegs_save <- vegs
-write.csv(cbind(lons_save, lats_save, vegs_save), "points_for_cells.csv")
-
-#lons <- lons_save[1:5000]
-#lats <- lats_save[1:5000]
-#vegs <- vegs_save[1:5000]
 
 library(prevR) # for point.in.SpatialPolygons
 cells_df <- station_shapes[1,]
@@ -80,6 +83,8 @@ cells_df$longitude <- 0
 cells_df$latitude <- 0
 cells_df$vegetation <- 0
 cells_df$spice <- 0
+
+# Compute cell shapes for every station
 # Runs into error at i=89
 for (i in 1:length(station_shapes)) {
     shape <- station_shapes[i,]
@@ -96,11 +101,6 @@ for (i in 1:length(station_shapes)) {
         shape$latitude <- shape@polygons[[1]]@labpt[2]
         shape$vegetation <- 16
         shape$spice <- 0
-        #path <- paste("data/stations/", shape$stationNam, sep="")
-        #writeOGR(shape, dsn=path, layer="voronoi", driver="ESRI Shapefile")
-        #writeOGR(shape, dsn="data/cells", layer=shape$stationNam, driver="ESRI Shapefile")
-        #station_shapes$cells[i] <- shape
-        # Append to SpatialPolygonsDataFrame
         cells_df <- rbind(cells_df, shape)
         next
     }
@@ -112,14 +112,10 @@ for (i in 1:length(station_shapes)) {
     station_cells$vegetation <- shape_vegs
     station_cells$spice <- 0
     station_cells$id <- shape$id
-    #path <- paste("data/stations/", shape$stationNam, sep="")
     
-    #writeOGR(station_cells, dsn=path, layer="voronoi", driver="ESRI Shapefile")
-    #writeOGR(station_cells, dsn="data/cells", layer=shape$stationNam, driver="ESRI Shapefile")
-    #station_shapes$cells[i] <- station_cells
     cells_df <- rbind(cells_df, station_cells)
-    # Append to SpatialPolygonsDataFrame
 }
 
-cells_df <- cells_df[-1,]
+# Write to file
+cells_df <- cells_df[-1,] # Remove indexes
 writeOGR(cells_df, dsn="data/grid", layer="voronoi", driver="ESRI Shapefile")

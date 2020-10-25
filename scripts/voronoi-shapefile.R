@@ -1,5 +1,7 @@
-# taken from https://github.com/walshc/voronoi
-# TODO figure out how i'm supposed to credit this
+### This code was taken from https://github.com/walshc/voronoi
+### Package installation was broken, so this script was just downloaded manually
+### Used to create shapefiles corresponding to a voronoi diagram for a number of lat/long points
+
 library(deldir)
 library(maptools)
 library(raster)

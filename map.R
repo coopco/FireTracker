@@ -12,7 +12,7 @@ vegetation_names <- read.csv("data/vegetation_names.csv")
 breaks <- c(0, 0.2, 0.4, 0.6, 0.8, 1)
 class_names <- c("Very Low", "Low", "Moderate", "High", "Very high")
 
-# Read station shapes
+# Read station shapefile
 shapes <- readOGR("data/voronoi/voronoi.shp")
 pal <- colorBin("YlOrRd", c(0,1), bins=5) # Define colour scheme
 shapes$class <- cut(shapes$spice, breaks=breaks, labels=class_names) # Sort risks into classes

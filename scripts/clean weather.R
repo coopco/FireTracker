@@ -1,6 +1,7 @@
-#CLEAN WEATHER DATA - RHONWYN
+### Used for cleaning weatherdata.csv, as downloaded from https://www.kaggle.com/jsphyg/weather-dataset-rattle-package
+# CLEAN WEATHER DATA - RHONWYN
 
-setwd("/Users/ronniebarker/Documents/Uni/3164")
+#setwd("/Users/ronniebarker/Documents/Uni/3164")
 weather <- read.csv('weatherdata.csv') #read in
 attach(weather)  #use c names
 

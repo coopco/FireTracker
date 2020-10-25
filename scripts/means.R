@@ -1,4 +1,7 @@
-setwd("/Users/ronniebarker/Documents/Uni/3164")
+### Adds weekly, monthly, and yearly means to each row of weather data
+### For use in prediction
+
+#setwd("/Users/ronniebarker/Documents/Uni/3164")
 wData <- read.csv("cleanedWeather.csv")
 wData <- wData[,-1]
 wData$Date <- as.Date(wData$Date, '%d/%m/%Y')

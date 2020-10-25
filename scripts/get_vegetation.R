@@ -1,12 +1,11 @@
-#library(rgdal)
-#remoteness <- readOGR("Datasets/remoteness.gpkg")
+### Gets the vegetation data for the training data
+### Uses DLCDv2.1 from https://www.abs.gov.au/ausstats/abs@.nsf/0/0B0A11102885339BCA257BD400157E61?Opendocument
+
 library(raster)
 vegetation <- raster("Datasets/vegetation.gpkg")
 data <- read.csv("Datasets/training_data.csv")
 
-#readOGR("Datasets", "Remoteness.gpkg")
-
-
+# Get rows/columns for each lat/long
 rows <- rowFromY(vegetation, data$latitude)
 cols <- colFromX(vegetation, data$longitude)
 data$vegetation <- vegetation[cbind(rows, cols)] # Takes some time to run
@@ -19,7 +18,7 @@ data_na <- data_na[data_na$class == 0,]
 n <- nrow(data_na)
 lat <- data_na$latitude
 lon <- data_na$longitude
-# Generate latitude and longitude
+# Generate random latitude and longitude
 r <- 0.25*sqrt(runif(n))
 th <- 2*pi*runif(n)
 latitude <- lat + r*cos(th)
@@ -35,7 +34,7 @@ data$vegetation <- vegetation[cbind(rows, cols)] # Takes some time to run
 sum(is.na(data$vegetation))
 
 
-# Save
+# Save to file, excluding nas
 data <- data[!is.na(data$vegetation),]
 data$vegetation[data$vegetation==35] = 0 # Change urban area class from 35 to 0
 write.csv(data, "Datasets/training_data.csv", row.names=F)

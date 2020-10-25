@@ -1,4 +1,6 @@
-setwd("/Users/ronniebarker/Documents/Uni/3164/bushfire")
+### Used for merging NASA fire hotspot arhive data, retrieved from https://firms.modaps.eosdis.nasa.gov/download/
+
+#setwd("/Users/ronniebarker/Documents/Uni/3164/bushfire")
 fire1 <- read.csv('fire_archive_M6_145466.csv')
 fire2 <- read.csv('fire_archive_V1_145468.csv')
 fire3 <- read.csv('fire_nrt_J1V-C2_145467.csv')
